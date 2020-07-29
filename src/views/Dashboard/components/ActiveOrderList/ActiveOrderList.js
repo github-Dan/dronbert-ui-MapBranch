@@ -79,7 +79,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function ActiveOrderList(props) {
-  console.log("props->",props)
+  // console.log("props->",props)
+
   const [state, setState] = useState({
     checkedA: false,
     checkedB: false,
@@ -94,32 +95,6 @@ function ActiveOrderList(props) {
   const classes = useStyles();
   const theme = useTheme();
 
-  function updateList(){
-    console.log('activeorderlist',props.activeorderlist)
-    // props.updateList([]);
-    // props.setactiveorderlist(props.activeorderlist)
-  }
-  const toggleActive=(selectedOrder) =>{
-    console.log('toggleActive called')
-    // const postsCopy = [...posts];
-    console.log('props.activeorderlist->',props.activeorderlist)
-    
-    // console.log("old toggled->",newPost[index].toggled)
-    // newPost[index].toggled === true
-    //     ?(newPost[index].toggled = false)
-    //     :(newPost[index].toggled = true)
-    // console.log("new toggled->",newPost[index].toggled)
-    console.log('props.activeorderlist [selectedOrder]',props.activeorderlist[selectedOrder])
-    console.log('AL selectedOrder->',selectedOrder)
-    props.setactiveorderlist(props.activeorderlist);
-    props.setSelectedOrder(selectedOrder)
-    // console.log("props.index->",props.index)
-    // setPosts(...newPost,newPost[index].toggled);
-    // setPosts(prevState => {
-    //     return {...prevState, toggled:prevState.toggled}
-    // });
-    
-}
   return ( 
     <div >
       {/* {
@@ -159,11 +134,11 @@ function ActiveOrderList(props) {
 
           {
           // Array.from(posts).map((element,index) =>
-            props.activeorderlist.map((element,selectedOrder) =>
+            props.activeorderlist.map((element,index) =>
               <Button 
                 color="primary"
-                key={selectedOrder}   
-                onClick={() => { toggleActive(selectedOrder) }}>{element['Tracking ID']}
+                key={index}   
+                onClick={() => { props.toggleActive(index) }}>{element['Tracking ID']}
               </Button>)
           // posts.map(post => <Button variant="contained" color="primary" key={post.id}>{post.name}</Button>)
           }

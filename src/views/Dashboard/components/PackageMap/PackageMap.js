@@ -16,11 +16,17 @@ const useStyles = makeStyles(() => ({
 }));
 
 const PackageMap = props => {
-
+  console.log('PackageMap props->',props)
+  console.log('PackageMap geo->',props.geo)
+  // if (props.trackingInfo !== undefined) {
+    console.log('trackingInfo-->',props.trackingInfo['current location'])
+  // }
   const classes = useStyles();
   return (
     <div className={classes.root}>
-      <GMap />
+      <GMap trackingInfo={props.trackingInfo}
+      />
+      <GMap/>
     </div>
   );
 };

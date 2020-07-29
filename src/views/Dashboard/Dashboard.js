@@ -23,6 +23,9 @@ import {
   TrackingBar,
   OrderDetail,
 } from './components';
+import { indexOf } from 'underscore';
+import { string } from 'prop-types';
+import { getGeneratedNameForNode } from 'typescript';
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -47,9 +50,11 @@ const Dashboard = () => {
   const [activeorderlist, setactiveorderlist] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(0);
   const [trackingInfo, setTrackingInfo] = useState({});
+  const [trackingID, setTrackingID] = useState(0);
+  const [geo, setGeo] = useState();
   const [orderDetail, setOrderDetail] = useState({});
   
-  console.log('dash selectedOrder->',selectedOrder)
+  // console.log('dash selectedOrder->',selectedOrder)
 
   const toggleDetail = (event) => {
     setLoadingDetail(true);
@@ -78,20 +83,69 @@ const Dashboard = () => {
 
   //fetch active order list data
   useEffect(() => {
-    console.log('useEffect called')
+    // console.log('useEffect called')
     axios.post('http://localhost:5000/activeorder',{
       user_id : 'abc'
     })
       .then(res => {
-        console.log('res->',res)
-        console.log('data->',res.data)
+        // console.log('res->',res)
+        // console.log('data->',res.data)
         setactiveorderlist(res.data)
       })
       .catch(err =>{
         console.log(err)
       })
-  },[])
-  // console.log('activeorderlist->',activeorderlist)
+  },[setactiveorderlist])
+  console.log('Dash activeorderlist->',activeorderlist)
+
+  //fetch tracking info
+  useEffect(() => {
+    // console.log('Tracking useEffect called')
+    const tracking_id=getTrackingID()
+    // console.log('tracking_id',tracking_id)
+    axios.post('http://localhost:5000/tracking',{
+      // tracking_id : '1111',
+      tracking_id : tracking_id
+    })
+      .then(res => {
+        // console.log('Tracking res->',res)
+        // console.log('Tracking data->',res.data)
+        setTrackingInfo(res.data)
+        console.log('trackingInfo-->',trackingInfo)
+      })
+      .catch(err =>{
+        console.log(err)
+      })
+      // getGeo()
+  },[selectedOrder,activeorderlist])
+
+  useEffect(() => {
+    if (trackingInfo !== undefined){
+      setGeo(trackingInfo['current location'])
+    }
+  }, [trackingInfo])
+  // console.log('GEO-->',geo)
+
+  const getTrackingID = () => {
+    // console.log('getTrackingID');
+    // console.log('Track activeorderlist->',activeorderlist)
+    // console.log('Track selectedOrder->',selectedOrder)
+    const activeorder = activeorderlist[selectedOrder]
+    // console.log('activeorder -->',activeorder)
+    if (activeorder !== undefined) {
+      // console.log('Tracking ID -->',activeorder['Tracking ID'])
+      return activeorder['Tracking ID']
+    }
+  }
+
+  const toggleActive=(index) =>{
+    // console.log('toggleActive called')
+    // console.log('props.activeorderlist->',activeorderlist)
+    // console.log('activeorderlist [index]',activeorderlist[index])
+    // console.log('AL index->',index)
+    setSelectedOrder(index)
+  }
+
 
   const renderOrderDetail = () => {
     console.log(loadingDetail);
@@ -104,6 +158,7 @@ const Dashboard = () => {
     }
     return <OrderDetail orderDetail={orderDetail}/>;
   }
+
 
   return (
     <Grid
@@ -139,7 +194,7 @@ const Dashboard = () => {
                   item
                   xl={12}
                 >
-                  {showDetail ? renderOrderDetail(): <PackageMap />}
+                  {showDetail ? renderOrderDetail(): <PackageMap trackingInfo={trackingInfo}/>}
                 </Grid>
               </Grid>
             </CardContent>
@@ -165,6 +220,7 @@ const Dashboard = () => {
         xl={3}
         xs={12}
       >
+        
         <Box className={classes.root}>
           <Card>
             <CardHeader title = "arrive in:"/>
@@ -176,6 +232,8 @@ const Dashboard = () => {
                 selectedOrder = {selectedOrder}
                 setactiveorderlist={setactiveorderlist}
                 setSelectedOrder = {setSelectedOrder}
+                toggleActive={toggleActive}
+                
               />
             </CardContent>
             <CardActions>
